@@ -1,1 +1,328 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#080811" />
+<meta name="description" content="CHRAVAN — discover, preview, and download music." />
+<title>CHRAVAN — Feel Every Frequency</title>
+<style>
+  :root {
+    --bg:#080811; --panel:rgba(19,19,38,.72); --panel2:#131326;
+    --text:#f7f7ff; --muted:#9c9cb8; --purple:#a855f7; --blue:#4f8cff;
+    --pink:#ff4fc8; --line:rgba(255,255,255,.10); --radius:22px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:90px}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;z-index:-3;background:
+    radial-gradient(ellipse at 12% 10%,rgba(128,49,235,.18),transparent 34%),
+    radial-gradient(ellipse at 88% 22%,rgba(35,108,255,.15),transparent 30%),
+    radial-gradient(ellipse at 55% 90%,rgba(255,55,184,.08),transparent 36%);pointer-events:none}
+  a{color:inherit;text-decoration:none}
+  button,input{font:inherit}
+  button{cursor:pointer}
+  .noise{position:fixed;inset:0;z-index:-1;opacity:.035;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E")}
+  .particles{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
+  .particle{position:absolute;width:3px;height:3px;border-radius:50%;background:#c6a0ff;box-shadow:0 0 12px #a855f7;animation:float var(--duration) ease-in-out infinite alternate;opacity:var(--opacity)}
+  @keyframes float{from{transform:translate3d(0,20px,0) scale(.7)}to{transform:translate3d(var(--drift),-100px,0) scale(1.5)}}
+  .topbar{position:sticky;top:0;z-index:20;padding:14px 5vw;background:rgba(8,8,17,.72);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06)}
+  .nav{max-width:1240px;margin:auto;display:flex;align-items:center;gap:26px}
+  .brand{display:flex;align-items:center;gap:10px;font-size:1.18rem;font-weight:900;letter-spacing:.18em;white-space:nowrap}
+  .brand-mark{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--purple),var(--blue));box-shadow:0 0 28px #8d45e955;position:relative;overflow:hidden}
+  .brand-mark::after{content:"";position:absolute;inset:-50%;background:linear-gradient(100deg,transparent 40%,#fff9 50%,transparent 60%);transform:translateX(-100%) rotate(20deg);animation:shine 4s infinite}
+  @keyframes shine{60%,100%{transform:translateX(100%) rotate(20deg)}}
+  .brand-mark svg{width:19px;fill:white}
+  .navlinks{display:flex;gap:24px;margin-left:auto;color:var(--muted);font-size:.9rem}
+  .navlinks a{transition:color .25s}.navlinks a:hover{color:white}
+  .nav-cta,.primary,.secondary,.filter,.icon-btn{border:0;border-radius:999px;transition:transform .25s,box-shadow .25s,background .25s}
+  .nav-cta{padding:11px 17px;background:#fff;color:#10101b;font-weight:800;font-size:.85rem}
+  .nav-cta:hover,.primary:hover{transform:translateY(-3px);box-shadow:0 10px 32px #8b5cf655}
+  .menu-btn{display:none;background:transparent;color:white;border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+  main{max-width:1240px;margin:auto;padding:0 5vw}
+  .hero{min-height:620px;display:grid;grid-template-columns:1.06fr .94fr;align-items:center;gap:35px;padding:75px 0 60px;position:relative}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;border:1px solid #b17aff45;background:#a855f714;border-radius:999px;padding:9px 13px;color:#d9c2ff;font-size:.75rem;font-weight:750;letter-spacing:.12em;text-transform:uppercase;animation:rise .8s both}
+  .live-dot{width:7px;height:7px;background:#65ffbf;border-radius:50%;box-shadow:0 0 12px #65ffbf;animation:pulse 1.5s infinite}
+  @keyframes pulse{50%{opacity:.35;transform:scale(.7)}}
+  h1{font-size:clamp(3.5rem,7.2vw,6.7rem);line-height:.94;letter-spacing:-.075em;margin:25px 0 22px;font-weight:950;animation:rise .8s .12s both}
+  .gradient-text{background:linear-gradient(100deg,#fff 5%,#c5a1ff 43%,#62b3ff 80%);color:transparent;background-clip:text;-webkit-background-clip:text}
+  .hero-copy{max-width:530px;color:#aaaac4;line-height:1.8;font-size:1.04rem;animation:rise .8s .22s both}
+  .hero-actions{display:flex;gap:13px;flex-wrap:wrap;margin-top:30px;animation:rise .8s .3s both}
+  .primary{padding:15px 22px;color:white;background:linear-gradient(105deg,#9b4df2,#547cff);font-weight:800;box-shadow:0 8px 28px #8651ed35}
+  .secondary{padding:14px 21px;color:white;background:#ffffff08;border:1px solid var(--line);font-weight:750}
+  .secondary:hover{background:#ffffff12;transform:translateY(-2px)}
+  .stats{display:flex;gap:28px;margin-top:35px;animation:rise .8s .4s both}
+  .stat strong{display:block;font-size:1.25rem}.stat span{color:var(--muted);font-size:.77rem}
+  @keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+  .hero-art{min-height:440px;display:grid;place-items:center;position:relative;perspective:1000px}
+  .orbit{position:absolute;width:min(35vw,410px);aspect-ratio:1;border:1px solid #b78aff2e;border-radius:50%;animation:spin 26s linear infinite}
+  .orbit::before,.orbit::after{content:"";position:absolute;width:9px;height:9px;border-radius:50%;background:#d7a7ff;box-shadow:0 0 22px #b56aff;top:16%;left:15%}
+  .orbit::after{top:auto;left:auto;right:8%;bottom:22%;background:#66b6ff;box-shadow:0 0 22px #66b6ff}
+  .orbit.two{width:min(29vw,330px);border-style:dashed;animation:spin 38s linear infinite reverse}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .album{width:min(67%,330px);aspect-ratio:1;position:relative;border-radius:30px;overflow:hidden;transform:rotateY(-13deg) rotateX(5deg);box-shadow:0 35px 100px #7c35e844;animation:albumfloat 6s ease-in-out infinite}
+  @keyframes albumfloat{50%{transform:translateY(-13px) rotateY(7deg) rotateX(-2deg)}}
+  .album-art{width:100%;height:100%;background:
+    radial-gradient(circle at 50% 45%,#ffb3ff 0 3%,transparent 4%),
+    radial-gradient(circle at 50% 45%,#d36aff 0 9%,transparent 10%),
+    radial-gradient(circle at 50% 45%,#6e3ad6 0 18%,transparent 19%),
+    repeating-radial-gradient(circle at 50% 45%,#ffffff20 0 1px,transparent 2px 9px),
+    conic-gradient(from 30deg at 50% 45%,#0b0b25,#5634b2,#0c5d99,#160d2e,#d04fa8,#10102d)}
+  .album-art::after{content:"CHRAVAN";position:absolute;bottom:22px;left:22px;font-weight:950;letter-spacing:.22em;font-size:1.05rem;text-shadow:0 2px 15px #000}
+  .equalizer{position:absolute;bottom:25px;right:24px;display:flex;align-items:end;gap:4px;height:35px}
+  .equalizer i{width:4px;border-radius:5px;background:#fff;height:var(--h);animation:eq .75s ease-in-out infinite alternate;animation-delay:var(--d)}
+  @keyframes eq{to{height:5px;opacity:.55}}
+  .floating-chip{position:absolute;padding:12px 15px;border:1px solid #ffffff1b;background:#15152bd9;backdrop-filter:blur(14px);border-radius:16px;box-shadow:0 14px 35px #0005;animation:chipfloat 5s ease-in-out infinite}
+  .floating-chip small{display:block;color:var(--muted);font-size:.68rem;margin-bottom:4px}
+  .floating-chip strong{font-size:.88rem}
+  .chip-top{top:12%;right:0}.chip-bottom{bottom:12%;left:0;animation-delay:-2s}
+  @keyframes chipfloat{50%{transform:translateY(-9px)}}
+  .section{padding:62px 0}
+  .section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:25px}
+  .kicker{color:#b994ff;font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;font-weight:850}
+  h2{font-size:clamp(1.8rem,3.5vw,2.7rem);letter-spacing:-.05em;margin:9px 0 0}
+  .section-desc{color:var(--muted);font-size:.9rem;line-height:1.7;margin:8px 0 0}
+  .search-wrap{display:flex;align-items:center;gap:10px;background:#ffffff08;border:1px solid var(--line);padding:0 15px;border-radius:14px;width:min(100%,300px)}
+  .search-wrap svg{width:18px;stroke:#a9a9c2;fill:none;stroke-width:2}
+  .search-wrap input{background:transparent;border:0;outline:0;color:white;padding:13px 0;width:100%;min-width:0}
+  .filters{display:flex;gap:9px;flex-wrap:wrap;margin:22px 0 27px}
+  .filter{padding:9px 15px;background:#ffffff07;color:#aaaac4;border:1px solid var(--line);font-size:.83rem}
+  .filter.active,.filter:hover{background:#a855f725;border-color:#b58aff70;color:#fff}
+  .music-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+  .track{padding:12px;border:1px solid #ffffff0d;border-radius:20px;background:linear-gradient(145deg,#ffffff0b,#ffffff03);transition:transform .35s,border-color .35s,background .35s;position:relative;overflow:hidden;opacity:0;transform:translateY(20px)}
+  .track.visible{opacity:1;transform:translateY(0);transition:opacity .6s,transform .6s,border-color .3s}
+  .track:hover{transform:translateY(-7px);border-color:#a855f766;background:#ffffff0d}
+  .cover{aspect-ratio:1;border-radius:14px;position:relative;overflow:hidden;display:grid;place-items:center;margin-bottom:13px}
+  .cover::before{content:"";position:absolute;width:65%;height:65%;border:1px solid #ffffff55;border-radius:50%;box-shadow:0 0 50px #ffffff15,inset 0 0 40px #ffffff12}
+  .cover::after{content:"";position:absolute;width:20%;height:20%;border-radius:50%;background:#ffffff65;filter:blur(2px)}
+  .cover svg{width:42px;height:42px;fill:#ffffffd9;z-index:1;filter:drop-shadow(0 4px 15px #0005)}
+  .c1{background:radial-gradient(circle at 30% 25%,#ff8bca,#722baf 43%,#15152f)}
+  .c2{background:radial-gradient(circle at 70% 20%,#6af0ff,#2353a8 42%,#10152b)}
+  .c3{background:radial-gradient(circle at 30% 70%,#ffe18c,#d95077 42%,#291537)}
+  .c4{background:radial-gradient(circle at 70% 65%,#a3ffbd,#268b80 40%,#101e36)}
+  .c5{background:radial-gradient(circle at 55% 25%,#ff8b58,#aa326e 43%,#20132f)}
+  .c6{background:radial-gradient(circle at 35% 40%,#b3a0ff,#5140b0 43%,#111329)}
+  .c7{background:radial-gradient(circle at 60% 35%,#f4a8ff,#7b3d8d 43%,#101125)}
+  .c8{background:radial-gradient(circle at 35% 65%,#a6e5ff,#3265a8 43%,#101329)}
+  .track-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .track h3{font-size:.97rem;margin:0 0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .track p{margin:0;color:var(--muted);font-size:.79rem}
+  .tag{font-size:.64rem;color:#d6c3ff;background:#a855f71b;border:1px solid #a855f72d;border-radius:999px;padding:4px 7px;white-space:nowrap}
+  .track-actions{display:flex;align-items:center;gap:8px;margin-top:15px}
+  .play-btn{width:37px;height:37px;display:grid;place-items:center;border:0;border-radius:50%;color:#fff;background:linear-gradient(135deg,#a855f7,#4f8cff);box-shadow:0 5px 18px #8b5cf633}
+  .play-btn svg{width:15px;fill:currentColor}
+  .download-btn{flex:1;text-align:center;border:1px solid var(--line);border-radius:999px;padding:9px 10px;font-size:.76rem;font-weight:750;background:#ffffff06;transition:.25s}
+  .download-btn:hover{border-color:#a855f7;color:#fff;background:#a855f71b}
+  .feature-band{margin:35px 0 65px;padding:34px;border:1px solid #a855f72c;border-radius:26px;background:linear-gradient(115deg,#a855f716,#4f8cff0c 65%,#ff4fc80a);display:grid;grid-template-columns:1.2fr .8fr;gap:25px;align-items:center;overflow:hidden;position:relative}
+  .feature-band::after{content:"";position:absolute;width:240px;height:240px;right:4%;top:-130px;border-radius:50%;background:#8b5cf733;filter:blur(50px)}
+  .feature-band h2{max-width:560px}
+  .feature-band p{color:var(--muted);line-height:1.75;max-width:540px}
+  .feature-pills{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end;position:relative;z-index:1}
+  .feature-pills span{padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:#0b0b18b8;font-size:.8rem;color:#d9d9ef}
+  footer{border-top:1px solid var(--line);padding:28px 5vw;color:var(--muted);font-size:.8rem}
+  .footer-inner{max-width:1240px;margin:auto;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,25px);opacity:0;pointer-events:none;z-index:50;background:#1a1930;border:1px solid #a855f766;color:white;padding:13px 18px;border-radius:13px;box-shadow:0 15px 45px #0008;font-size:.88rem;transition:.3s}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .player{position:fixed;bottom:16px;left:50%;transform:translate(-50%,130%);width:min(720px,calc(100% - 24px));z-index:30;border:1px solid #ffffff1c;background:rgba(17,17,35,.92);backdrop-filter:blur(22px);border-radius:18px;padding:12px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 20px 70px #0009;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+  .player.show{transform:translate(-50%,0)}
+  .player-cover{width:44px;height:44px;border-radius:12px;flex-shrink:0}
+  .player-info{min-width:0;flex:1}.player-info strong{display:block;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.player-info span{font-size:.75rem;color:var(--muted)}
+  .player button{border:0;background:transparent;color:white;font-size:1.15rem}
+  .player input{width:100%;accent-color:#a855f7}
+  .player-time{display:flex;align-items:center;gap:10px;flex:1;min-width:90px}
+  .player-time input{min-width:0}
+  .empty{grid-column:1/-1;text-align:center;padding:45px 10px;color:var(--muted);border:1px dashed var(--line);border-radius:18px}
+
+  /* CHRAVAN signature motion pack */
+  .hero-brand-title{position:relative;margin:23px 0 18px;isolation:isolate}
+  .hero-brand-word{display:block;font-size:clamp(4.2rem,10.8vw,9rem);font-weight:1000;line-height:.82;letter-spacing:-.085em;
+    background:linear-gradient(100deg,#fff 0%,#e5c8ff 18%,#9d56ff 35%,#62c8ff 53%,#fff 65%,#fa64e8 82%,#b38cff 100%);
+    background-size:260% auto;color:transparent;background-clip:text;-webkit-background-clip:text;
+    filter:drop-shadow(0 0 9px #8a45ff8c) drop-shadow(0 0 35px #5d75ff55);
+    animation:brandGradient 6s linear infinite,brandFloat 4s ease-in-out infinite,brandReveal 1.1s cubic-bezier(.2,.8,.2,1) both;
+    transform-origin:center left}
+  .hero-brand-word::after{content:"CHRAVAN";position:absolute;left:0;top:0;z-index:-1;color:transparent;-webkit-text-stroke:1px #c69cff66;filter:blur(12px);animation:brandGlow 2.6s ease-in-out infinite alternate}
+  .hero-brand-sub{display:block;margin-top:18px;font-size:clamp(.68rem,1.4vw,.95rem);font-weight:800;letter-spacing:.34em;color:#e7dcff;animation:rise .9s .35s both}
+  .hero-brand-sub i{font-style:normal;color:#57caff;padding:0 .25em}
+  .owner-ribbon{display:inline-flex;align-items:center;gap:10px;margin-top:22px;padding:10px 15px;border:1px solid #b76cff75;border-radius:8px 18px 8px 18px;background:linear-gradient(100deg,#a855f72c,#268bff20);box-shadow:0 0 30px #923cff20;letter-spacing:.16em;font-size:.65rem;color:#c7c2e7;animation:ownerIn .9s .5s both,ownerGlow 3s 1.5s infinite alternate}
+  .owner-ribbon strong{font-size:.88rem;color:#fff;letter-spacing:.12em;text-shadow:0 0 14px #c084fc}
+  .hero-tagline{font-size:clamp(1.4rem,3vw,2.5rem);letter-spacing:-.055em;margin:24px 0 12px;animation:rise .8s .15s both}
+  #headline{display:inline-block;transition:opacity .26s,filter .26s,transform .26s}
+  #headline.word-out{opacity:0;filter:blur(8px);transform:translateY(8px)}
+  @keyframes brandGradient{to{background-position:260% center}}
+  @keyframes brandFloat{0%,100%{transform:translateY(0) skewX(0deg)}50%{transform:translateY(-7px) skewX(-.5deg)}}
+  @keyframes brandReveal{from{opacity:0;filter:blur(18px) drop-shadow(0 0 0 transparent);transform:translateY(30px) scale(.9)}to{opacity:1}}
+  @keyframes brandGlow{from{opacity:.25;transform:translate(0,0)}to{opacity:.9;transform:translate(2px,-2px)}}
+  @keyframes ownerIn{from{opacity:0;transform:translateX(-22px) skewX(-8deg)}to{opacity:1;transform:translateX(0) skewX(0)}}
+  @keyframes ownerGlow{from{box-shadow:0 0 12px #923cff10}to{box-shadow:0 0 28px #923cff45}}
+  .hero-art::before{content:"";position:absolute;width:75%;height:75%;border-radius:50%;background:conic-gradient(from 0deg,transparent,#8b5cf7aa,transparent,#45b8ff99,transparent);filter:blur(48px);opacity:.22;animation:spin 18s linear infinite}
+  .album{animation:albumfloat 6s ease-in-out infinite,albumGlow 4s ease-in-out infinite alternate}
+  @keyframes albumGlow{from{box-shadow:0 25px 75px #7c35e833,0 0 0 #5a91ff00}to{box-shadow:0 35px 100px #7c35e866,0 0 35px #5a91ff33}}
+  .cover{isolation:isolate;transition:transform .35s}
+  .cover::before{animation:coverOrbit 10s linear infinite}
+  .cover::after{animation:coverPulse 3s ease-in-out infinite alternate}
+  @keyframes coverOrbit{to{transform:rotate(360deg)}}
+  @keyframes coverPulse{from{transform:scale(.8);opacity:.55}to{transform:scale(1.18);opacity:.9}}
+  .track:hover .cover{transform:scale(.975)}
+  .primary,.play-btn{position:relative;overflow:hidden}
+  .primary::after,.play-btn::after{content:"";position:absolute;inset:-60% auto -60% -60%;width:40%;transform:rotate(25deg);background:linear-gradient(90deg,transparent,#ffffff80,transparent);animation:buttonShimmer 5s ease-in-out infinite}
+  @keyframes buttonShimmer{0%,60%{left:-60%}100%{left:140%}}
+  .section .kicker{animation:kickerPulse 4s ease-in-out infinite}
+  @keyframes kickerPulse{50%{text-shadow:0 0 14px #a855f799}}
+  .feature-band{background-size:200% 200%;animation:featureGradient 12s ease infinite}
+  @keyframes featureGradient{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+  .feature-pills span{transition:transform .3s,border-color .3s,box-shadow .3s}
+  .feature-pills span:hover{transform:translateY(-5px) rotate(-1deg);border-color:#a855f780;box-shadow:0 10px 28px #8b5cf722}
+  .brand:hover .brand-mark{transform:rotate(-12deg) scale(1.08)}
+  .brand-mark{transition:transform .3s}
+  .navlinks a{position:relative}
+  .navlinks a::after{content:"";position:absolute;left:0;right:100%;bottom:-7px;height:2px;background:linear-gradient(90deg,var(--purple),var(--blue));transition:right .3s}
+  .navlinks a:hover::after{right:0}
+  .owner-credit{color:#d8b7ff;text-shadow:0 0 14px #a855f755}
+  @media(max-width:620px){.hero-brand-word{font-size:clamp(3.4rem,16vw,6rem);letter-spacing:-.09em}.hero-brand-sub{letter-spacing:.2em}.owner-ribbon{gap:7px;letter-spacing:.08em;padding:9px 11px}.owner-ribbon strong{font-size:.78rem}.hero-tagline{margin-top:20px}}
+  @media(prefers-reduced-motion:reduce){.hero-brand-word,.hero-brand-word::after,.owner-ribbon,.hero-art::before,.cover::before,.cover::after,.primary::after,.play-btn::after,.feature-band{animation:none!important}}
+
+  @media(max-width:900px){.hero{grid-template-columns:1fr;gap:5px;padding-top:60px}.hero-art{min-height:390px}.orbit{width:min(65vw,360px)}.orbit.two{width:min(52vw,290px)}.album{width:min(58%,300px)}.music-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.feature-band{grid-template-columns:1fr}.feature-pills{justify-content:flex-start}.navlinks{gap:15px}}
+  @media(max-width:620px){.topbar{padding:12px 4vw}.nav{gap:12px}.brand{font-size:1rem;letter-spacing:.12em}.brand-mark{width:31px;height:31px}.navlinks{display:none;position:absolute;top:60px;left:4vw;right:4vw;margin:0;padding:17px;background:#121226f5;border:1px solid var(--line);border-radius:16px;flex-direction:column;gap:17px}.navlinks.open{display:flex}.menu-btn{display:block;margin-left:auto}.nav-cta{padding:10px 12px;font-size:.77rem}.hero{padding:52px 0 25px;min-height:auto}h1{font-size:clamp(3.3rem,17vw,5.2rem)}.hero-copy{font-size:.94rem}.hero-art{min-height:330px}.chip-top{right:-2px;top:8%}.chip-bottom{left:-2px;bottom:6%}.floating-chip{padding:10px 12px}.stats{gap:20px}.section{padding:45px 0}.section-head{align-items:stretch;flex-direction:column}.search-wrap{width:100%}.music-grid{gap:11px}.track{padding:9px;border-radius:16px}.cover{border-radius:11px}.track h3{font-size:.87rem}.track p{font-size:.73rem}.tag{display:none}.feature-band{padding:24px;margin:20px 0 45px}.feature-band h2{font-size:1.8rem}.player{gap:9px;padding:10px}.player-time{display:none}.footer-inner{flex-direction:column}.nav-cta{display:none}}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="noise"></div><div class="particles" id="particles" aria-hidden="true"></div>
+<header class="topbar">
+  <nav class="nav" aria-label="Main navigation">
+    <a class="brand" href="#home" aria-label="CHRAVAN home"><span class="brand-mark"><svg viewBox="0 0 24 24"><path d="M12 2v13.2a4.2 4.2 0 1 1-2-3.58V6l12-2v11.2a4.2 4.2 0 1 1-2-3.58V2z"/></svg></span>CHRAVAN</a>
+    <div class="navlinks" id="navlinks"><a href="#home">Home</a><a href="#discover">Discover</a><a href="#genres">Genres</a><a href="#about">About</a></div>
+    <a class="nav-cta" href="#discover">Explore music ↗</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Toggle navigation">☰</button>
+  </nav>
+</header>
+<main>
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <div class="eyebrow"><span class="live-dot"></span> YOUR NEXT SOUND STARTS HERE</div>
+      <div class="hero-brand-title" aria-label="CHRAVAN">
+        <span class="hero-brand-word">CHRAVAN</span>
+        <span class="hero-brand-sub">DOWNLOAD <i>•</i> LISTEN <i>•</i> ENJOY</span>
+        <span class="owner-ribbon">CREATED BY <strong>ALVAN CHRAVAN</strong></span>
+      </div>
+      <h1 class="hero-tagline">Feel every <span class="gradient-text" id="headline">frequency.</span></h1>
+      <p class="hero-copy">Discover your next favorite track. Explore fresh sounds, preview music, and find downloads from one beautifully crafted music destination.</p>
+      <div class="hero-actions"><a class="primary" href="#discover">♫ &nbsp; Discover music</a><a class="secondary" href="#about">Explore the vibe&nbsp; ↘</a></div>
+      <div class="stats"><div class="stat"><strong>∞</strong><span>Sounds to discover</span></div><div class="stat"><strong>24/7</strong><span>Your music mood</span></div><div class="stat"><strong>HD</strong><span>Audio-ready design</span></div></div>
+    </div>
+    <div class="hero-art" aria-label="Abstract animated music artwork">
+      <div class="orbit"></div><div class="orbit two"></div>
+      <div class="album"><div class="album-art"></div><div class="equalizer" aria-hidden="true"><i style="--h:18px;--d:-.1s"></i><i style="--h:30px;--d:-.4s"></i><i style="--h:13px;--d:-.2s"></i><i style="--h:25px;--d:-.6s"></i><i style="--h:34px;--d:-.3s"></i><i style="--h:15px;--d:-.5s"></i><i style="--h:28px;--d:-.15s"></i></div></div>
+      <div class="floating-chip chip-top"><small>NOW DISCOVERING</small><strong>✦ Your next favorite</strong></div>
+      <div class="floating-chip chip-bottom"><small>THE CHRAVAN SOUND</small><strong>Feel the frequency ↗</strong></div>
+    </div>
+  </section>
+  <section class="section" id="discover">
+    <div class="section-head"><div><div class="kicker">The sound library</div><h2>Discover your next obsession.</h2><p class="section-desc">Explore the demo collection. Connect your own licensed tracks to enable real previews and downloads.</p></div>
+      <label class="search-wrap"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="searchInput" type="search" placeholder="Search tracks or artists…" aria-label="Search tracks or artists"></label>
+    </div>
+    <div class="filters" id="genres"><button class="filter active" data-genre="All">All sounds</button><button class="filter" data-genre="Afrobeats">Afrobeats</button><button class="filter" data-genre="Amapiano">Amapiano</button><button class="filter" data-genre="Hip-Hop">Hip-Hop</button><button class="filter" data-genre="R&B">R&amp;B</button><button class="filter" data-genre="Electronic">Electronic</button></div>
+    <div class="music-grid" id="musicGrid"></div>
+  </section>
+  <section class="feature-band" id="about">
+    <div><div class="kicker">Made for music lovers</div><h2>A beautiful home for the sounds that move you.</h2><p>CHRAVAN is a front-end demo built for discovery. Add audio files you own or are licensed to distribute, and turn the sample cards into a real music library.</p><a class="secondary" href="#discover" style="display:inline-block">Back to the music ↑</a></div>
+    <div class="feature-pills"><span>✦ Immersive design</span><span>◉ Responsive layout</span><span>♫ Music-first</span><span>↗ Easy to customize</span></div>
+  </section>
+</main>
+<footer><div class="footer-inner"><a class="brand" href="#home"><span class="brand-mark"><svg viewBox="0 0 24 24"><path d="M12 2v13.2a4.2 4.2 0 1 1-2-3.58V6l12-2v11.2a4.2 4.2 0 1 1-2-3.58V2z"/></svg></span>CHRAVAN</a><span>© <span id="year"></span> CHRAVAN. Built for the love of sound.</span><span>Designed &amp; developed by <strong style="color:#d8b7ff">ALVAN CHRAVAN</strong></span><span>Only download music you have permission to distribute.</span></div></footer>
+<div class="player" id="player" aria-label="Audio preview player"><div class="player-cover c1" id="playerCover"></div><div class="player-info"><strong id="playerTitle">Preview player</strong><span id="playerArtist">Choose a track</span></div><button id="playerPlay" aria-label="Play or pause">▶</button><div class="player-time"><span id="currentTime">0:00</span><input id="seek" type="range" min="0" max="100" value="0" aria-label="Seek audio"><span id="duration">0:00</span></div><button id="closePlayer" aria-label="Close player">×</button><audio id="audio" preload="none"></audio></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+  // Add your own authorized audio URLs in the `audio` property to enable previews and downloads.
+  const tracks = [
+    {id:1,title:"Midnight Motion",artist:"CHRAVAN Selects",genre:"Afrobeats",duration:"3:24",cover:"c1",audio:"",download:""},
+    {id:2,title:"Blue Horizon",artist:"Nova Wave",genre:"Amapiano",duration:"4:02",cover:"c2",audio:"",download:""},
+    {id:3,title:"Golden Hour",artist:"Mira Sol",genre:"R&B",duration:"3:18",cover:"c3",audio:"",download:""},
+    {id:4,title:"Green Lights",artist:"Kito Pulse",genre:"Electronic",duration:"2:56",cover:"c4",audio:"",download:""},
+    {id:5,title:"City After Dark",artist:"Eastside Echo",genre:"Hip-Hop",duration:"3:41",cover:"c5",audio:"",download:""},
+    {id:6,title:"Purple Skies",artist:"Luna Keys",genre:"Afrobeats",duration:"3:09",cover:"c6",audio:"",download:""},
+    {id:7,title:"Velvet Dreams",artist:"Ari Moon",genre:"R&B",duration:"3:33",cover:"c7",audio:"",download:""},
+    {id:8,title:"Ocean Frequency",artist:"Deep Current",genre:"Amapiano",duration:"5:11",cover:"c8",audio:"",download:""}
+  ];
+  const musicGrid = document.getElementById('musicGrid');
+  const searchInput = document.getElementById('searchInput');
+  const filters = [...document.querySelectorAll('.filter')];
+  let activeGenre = 'All', currentTrack = null, toastTimer;
+  const audio = document.getElementById('audio');
+  const playIcon = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+  const pauseIcon = '<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+  function showToast(message){
+    const toast=document.getElementById('toast');toast.textContent=message;toast.classList.add('show');
+    clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),3200);
+  }
+  function renderTracks(){
+    const query=searchInput.value.trim().toLowerCase();
+    const shown=tracks.filter(t=>(activeGenre==='All'||t.genre===activeGenre)&&(`${t.title} ${t.artist} ${t.genre}`).toLowerCase().includes(query));
+    musicGrid.innerHTML='';
+    if(!shown.length){musicGrid.innerHTML='<div class="empty">No tracks found. Try another search or genre.</div>';return;}
+    shown.forEach((t,index)=>{
+      const card=document.createElement('article');card.className='track';card.style.transitionDelay=`${index*65}ms`;
+      card.innerHTML=`<div class="cover ${t.cover}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12.2a4 4 0 1 1-2-3.45V6l11-2v11.2a4 4 0 1 1-2-3.45V3z"/></svg></div>
+      <div class="track-top"><div style="min-width:0"><h3 title="${t.title}">${t.title}</h3><p>${t.artist}</p></div><span class="tag">${t.genre}</span></div>
+      <div class="track-actions"><button class="play-btn" data-play="${t.id}" aria-label="Preview ${t.title}">${playIcon}</button><button class="download-btn" data-download="${t.id}">↓ Download</button></div>`;
+      musicGrid.appendChild(card);requestAnimationFrame(()=>card.classList.add('visible'));
+    });
+    musicGrid.querySelectorAll('[data-play]').forEach(b=>b.addEventListener('click',()=>playTrack(Number(b.dataset.play))));
+    musicGrid.querySelectorAll('[data-download]').forEach(b=>b.addEventListener('click',()=>downloadTrack(Number(b.dataset.download))));
+  }
+  function playTrack(id){
+    const t=tracks.find(x=>x.id===id);if(!t)return;
+    if(!t.audio){showToast(`Add an authorized audio URL to “${t.title}” to enable playback.`);return;}
+    currentTrack=t;audio.src=t.audio;audio.play().then(()=>{
+      document.getElementById('player').classList.add('show');
+      document.getElementById('playerTitle').textContent=t.title;
+      document.getElementById('playerArtist').textContent=t.artist;
+      document.getElementById('playerCover').className=`player-cover ${t.cover}`;
+      document.getElementById('playerPlay').textContent='Ⅱ';
+    }).catch(()=>showToast('This audio could not be played. Check the audio URL.'));
+  }
+  function downloadTrack(id){
+    const t=tracks.find(x=>x.id===id);if(!t)return;
+    const url=t.download||t.audio;
+    if(!url){showToast(`Add a licensed download URL to “${t.title}” to enable downloads.`);return;}
+    const link=document.createElement('a');link.href=url;link.download=`${t.artist} - ${t.title}`;link.rel='noopener';document.body.appendChild(link);link.click();link.remove();
+  }
+  filters.forEach(btn=>btn.addEventListener('click',()=>{filters.forEach(x=>x.classList.toggle('active',x===btn));activeGenre=btn.dataset.genre;renderTracks();}));
+  searchInput.addEventListener('input',renderTracks);
+  document.getElementById('menuBtn').addEventListener('click',()=>document.getElementById('navlinks').classList.toggle('open'));
+  document.querySelectorAll('#navlinks a').forEach(a=>a.addEventListener('click',()=>document.getElementById('navlinks').classList.remove('open')));
+  document.getElementById('playerPlay').addEventListener('click',()=>{if(!audio.src)return;if(audio.paused)audio.play();else audio.pause();});
+  audio.addEventListener('play',()=>document.getElementById('playerPlay').textContent='Ⅱ');
+  audio.addEventListener('pause',()=>document.getElementById('playerPlay').textContent='▶');
+  audio.addEventListener('timeupdate',()=>{document.getElementById('currentTime').textContent=fmt(audio.currentTime);document.getElementById('seek').value=audio.duration?audio.currentTime/audio.duration*100:0;});
+  audio.addEventListener('loadedmetadata',()=>document.getElementById('duration').textContent=fmt(audio.duration));
+  document.getElementById('seek').addEventListener('input',e=>{if(audio.duration)audio.currentTime=audio.duration*Number(e.target.value)/100;});
+  document.getElementById('closePlayer').addEventListener('click',()=>{audio.pause();document.getElementById('player').classList.remove('show');});
+  function fmt(s){if(!Number.isFinite(s))return '0:00';return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;}
+  // Decorative particles; kept lightweight and hidden from assistive technology.
+  const particleBox=document.getElementById('particles');
+  for(let i=0;i<28;i++){const p=document.createElement('span');p.className='particle';p.style.left=Math.random()*100+'%';p.style.top=Math.random()*100+'%';p.style.setProperty('--duration',(5+Math.random()*10)+'s');p.style.setProperty('--drift',(-40+Math.random()*80)+'px');p.style.setProperty('--opacity',(.15+Math.random()*.5));p.style.animationDelay=(-Math.random()*12)+'s';particleBox.appendChild(p);}
+  // Reveal elements when they enter the viewport.
+  if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target);}}),{threshold:.08});document.querySelectorAll('.section,.feature-band').forEach(el=>observer.observe(el));}
+  document.getElementById('year').textContent=new Date().getFullYear();
+  renderTracks();
+
+  // A subtle headline shimmer that pauses when reduced motion is requested.
+  const headline = document.getElementById('headline');
+  if (headline && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const words = ['frequency.', 'your vibe.', 'the moment.', 'your sound.'];
+    let wordIndex = 0;
+    setInterval(() => {
+      headline.classList.add('word-out');
+      setTimeout(() => {
+        wordIndex = (wordIndex + 1) % words.length;
+        headline.textContent = words[wordIndex];
+        headline.classList.remove('word-out');
+      }, 260);
+    }, 3400);
+  }
+</script>
+</body>
+  </html>
